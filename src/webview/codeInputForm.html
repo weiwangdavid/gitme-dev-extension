@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Changes Input</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: var(--vscode-font-family);
+            color: var(--vscode-foreground);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 12px;
+            border: 1px solid var(--vscode-input-border);
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border-radius: 4px;
+            font-family: var(--vscode-editor-font-family);
+            font-size: var(--vscode-editor-font-size);
+            line-height: 1.5;
+            resize: vertical;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        button:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+        .error {
+            color: var(--vscode-errorForeground);
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <form id="codeInputForm">
+        <div class="form-group">
+            <label for="codeChanges">Please paste or describe your code changes:</label>
+            <textarea 
+                id="codeChanges" 
+                name="codeChanges" 
+                placeholder="Enter your code changes or description here..."
+                required
+            ></textarea>
+            <div class="error" id="codeError">Code changes description is required</div>
+        </div>
+        
+        <button type="submit">Continue to Decision Record</button>
+    </form>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+        
+        // Restore previous state if any
+        const previousState = vscode.getState();
+        if (previousState?.codeChanges) {
+            document.getElementById('codeChanges').value = previousState.codeChanges;
+        }
+
+        document.getElementById('codeInputForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            document.getElementById('codeError').style.display = 'none';
+            
+            const codeChanges = document.getElementById('codeChanges').value.trim();
+            
+            if (!codeChanges) {
+                document.getElementById('codeError').style.display = 'block';
+                return;
+            }
+            
+            // Save state
+            vscode.setState({ codeChanges });
+            
+            // Send message to extension
+            vscode.postMessage({
+                type: 'continue',
+                data: { codeChanges }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -9,10 +9,11 @@ interface DecisionRecord {
     decision: string;
     impacts: string;
     date: string;
+    codeChanges: string;
 }
 
-class DecisionRecordPanel {
-    public static currentPanel: DecisionRecordPanel | undefined;
+class CodeInputPanel {
+    public static currentPanel: CodeInputPanel | undefined;
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionPath: string;
     private _disposables: vscode.Disposable[] = [];
@@ -28,8 +29,9 @@ class DecisionRecordPanel {
         this._panel.webview.onDidReceiveMessage(
             async (message) => {
                 switch (message.type) {
-                    case 'submit':
-                        await this._createDecisionRecord(message.data);
+                    case 'continue':
+                        this._panel.dispose();
+                        DecisionRecordPanel.createOrShow(this._extensionPath, message.data.codeChanges);
                         break;
                 }
             },
@@ -39,6 +41,81 @@ class DecisionRecordPanel {
     }
 
     public static createOrShow(extensionPath: string) {
+        const column = vscode.window.activeTextEditor
+            ? vscode.window.activeTextEditor.viewColumn
+            : undefined;
+
+        if (CodeInputPanel.currentPanel) {
+            CodeInputPanel.currentPanel._panel.reveal(column);
+            return;
+        }
+
+        const panel = vscode.window.createWebviewPanel(
+            'codeInput',
+            'Code Changes Input',
+            column || vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                localResourceRoots: [
+                    vscode.Uri.file(path.join(extensionPath, 'src', 'webview'))
+                ]
+            }
+        );
+
+        CodeInputPanel.currentPanel = new CodeInputPanel(panel, extensionPath);
+    }
+
+    private _getWebviewContent() {
+        const webviewPath = path.join(this._extensionPath, 'src', 'webview', 'codeInputForm.html');
+        let content = fs.readFileSync(webviewPath, 'utf8');
+        return content;
+    }
+
+    public dispose() {
+        CodeInputPanel.currentPanel = undefined;
+        this._panel.dispose();
+        while (this._disposables.length) {
+            const disposable = this._disposables.pop();
+            if (disposable) {
+                disposable.dispose();
+            }
+        }
+    }
+}
+
+class DecisionRecordPanel {
+    public static currentPanel: DecisionRecordPanel | undefined;
+    private readonly _panel: vscode.WebviewPanel;
+    private readonly _extensionPath: string;
+    private readonly _codeChanges: string;
+    private _disposables: vscode.Disposable[] = [];
+
+    private constructor(panel: vscode.WebviewPanel, extensionPath: string, codeChanges: string) {
+        this._panel = panel;
+        this._extensionPath = extensionPath;
+        this._codeChanges = codeChanges;
+
+        this._panel.webview.html = this._getWebviewContent();
+        this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+        
+        // Handle messages from the webview
+        this._panel.webview.onDidReceiveMessage(
+            async (message) => {
+                switch (message.type) {
+                    case 'submit':
+                        await this._createDecisionRecord({
+                            ...message.data,
+                            codeChanges: this._codeChanges
+                        });
+                        break;
+                }
+            },
+            null,
+            this._disposables
+        );
+    }
+
+    public static createOrShow(extensionPath: string, codeChanges: string) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
@@ -60,7 +137,7 @@ class DecisionRecordPanel {
             }
         );
 
-        DecisionRecordPanel.currentPanel = new DecisionRecordPanel(panel, extensionPath);
+        DecisionRecordPanel.currentPanel = new DecisionRecordPanel(panel, extensionPath, codeChanges);
     }
 
     private async _createDecisionRecord(data: any) {
@@ -85,6 +162,7 @@ class DecisionRecordPanel {
             
             const content = `# ${record.title}\n\n` +
                 `Date: ${record.date}\n\n` +
+                `## Code Changes\n\n\`\`\`\n${record.codeChanges}\n\`\`\`\n\n` +
                 `## Context\n\n${record.context}\n\n` +
                 `## Decision\n\n${record.decision}\n\n` +
                 `## Impacts\n\n${record.impacts}\n`;
@@ -123,7 +201,7 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Decision Record extension is now active!');
 
     let disposable = vscode.commands.registerCommand('gitme-dev-extension.createDecisionRecord', () => {
-        DecisionRecordPanel.createOrShow(context.extensionPath);
+        CodeInputPanel.createOrShow(context.extensionPath);
     });
 
     context.subscriptions.push(disposable);
