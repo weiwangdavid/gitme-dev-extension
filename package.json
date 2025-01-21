@@ -3,6 +3,7 @@
   "displayName": "Decision Record Manager",
   "description": "Create and manage architectural decision records (ADR) directly in VS Code",
   "version": "0.0.1",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.95.0"
   },

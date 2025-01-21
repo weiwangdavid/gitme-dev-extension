@@ -1,5 +1,7 @@
 # gitme-dev-extension README
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 This is the README for your extension "gitme-dev-extension". After writing up a brief description, we recommend including the following sections.
 
 ## Features
