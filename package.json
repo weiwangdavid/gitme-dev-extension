@@ -20,7 +20,7 @@
       },
       {
         "command": "gitme-dev-extension.createDecisionRecord",
-        "title": "Create Decision Record"
+        "title": "Record a decision"
       }
     ]
   },

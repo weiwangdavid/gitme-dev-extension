@@ -27,7 +27,7 @@ Easily create new decision records with a structured format that includes:
 
 To create a new decision record:
 1. Open the command palette (Cmd+Shift+P / Ctrl+Shift+P)
-2. Type "Create Decision Record"
+2. Type "Record a decision"
 3. Follow the prompts to enter:
    - Decision title
    - Context of the decision
