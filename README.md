@@ -36,20 +36,104 @@ The extension will:
 - Name the file based on your decision name
 - Open the saved file for review
 
-## File Structure
+## Decision Record Template Guide
 
-Decision records are stored in the `.decisions` directory of your workspace. Each file is named using the decision name (converted to lowercase with spaces replaced by hyphens).
+The decision record template is structured to capture comprehensive information about your architectural decisions. Here's what to include in each section:
 
-For example, if your decision is named "Use PostgreSQL for Database", the file will be saved as:
+### Title
+```markdown
+# Decision Record: <Enter Decision Name>
 ```
-.decisions/use-postgresql-for-database.md
-```
+Provide a clear, concise name for your decision. This will also be used to generate the file name.
 
-Each decision record follows a structured template that includes:
-- Decision Overview
-- Context Recording
-- Impact Forecast
-- Decision Sidecast
+### Decision Overview
+```markdown
+## Decision Overview
+- Description: <Enter a brief description of the decision>
+```
+Write a short summary (1-2 sentences) of what this decision is about. This should give readers a quick understanding of the decision without diving into details.
+
+### Context Recording
+```markdown
+## Context Recording
+### Current Situation/Problem
+<Describe the situation or problem you are facing that led to this decision>
+
+### Assumptions
+<List the key assumptions behind this decision>
+```
+- **Current Situation/Problem**: Explain the circumstances or challenges that prompted this decision. Include:
+  - What triggered the need for this decision?
+  - What problems are you trying to solve?
+  - What is the current state of the system?
+
+- **Assumptions**: List any assumptions you're making about:
+  - Technical environment
+  - Business context
+  - Resource availability
+  - Future conditions
+  - Constraints
+
+### Impact Forecast
+```markdown
+## Impact Forecast
+### Potential Positive Impacts
+<List potential positive impacts to the system>
+
+#### Required Actions for Positive Impacts
+<List actions needed to pursue these positive impacts>
+
+### Potential Negative Impacts
+<List potential negative impacts to the system>
+
+#### Mitigation Actions for Negative Impacts
+<List actions needed to avoid or mitigate these negative impacts>
+```
+- **Positive Impacts**: Describe the benefits and improvements this decision will bring:
+  - Performance improvements
+  - Better maintainability
+  - Enhanced security
+  - Cost savings
+  - List specific actions needed to achieve these benefits
+
+- **Negative Impacts**: Consider potential drawbacks and risks:
+  - Technical debt
+  - Resource requirements
+  - Learning curve
+  - Migration challenges
+  - Include specific mitigation strategies for each risk
+
+### Decision Sidecast
+```markdown
+## Decision Sidecast
+### Alternatives Considered
+<List alternative approaches that were considered>
+
+### Comparison Analysis
+#### Pros of Current Decision
+<List advantages of this decision compared to alternatives>
+
+#### Cons of Current Decision
+<List disadvantages of this decision compared to alternatives>
+```
+- **Alternatives**: Document other options you considered:
+  - Different technologies
+  - Alternative approaches
+  - Other solutions evaluated
+
+- **Comparison Analysis**: Provide a balanced analysis:
+  - Why this solution was chosen over alternatives
+  - Trade-offs made in the decision
+  - Long-term implications of the choice
+
+## Best Practices for Writing Decision Records
+
+1. **Be Specific**: Provide concrete details and examples where possible
+2. **Stay Objective**: Present facts and balanced arguments
+3. **Think Long-term**: Consider future maintenance and scalability
+4. **Consider Context**: Include relevant technical and business context
+5. **Be Concise**: Keep information clear and to the point
+6. **Update When Needed**: Revisit and update decisions if circumstances change
 
 ## Requirements
 
