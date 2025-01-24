@@ -205,7 +205,6 @@ export function activate(context: vscode.ExtensionContext) {
         const template = `# Decision Record: <Enter Decision Name>
 
 ## Decision Overview
-- Decision Name: <Enter the name of your decision>
 - Description: <Enter a brief description of the decision>
 
 ## Context Recording
