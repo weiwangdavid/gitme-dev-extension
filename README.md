@@ -18,50 +18,38 @@ For example if there is an image subfolder under your extension project workspac
 
 A VS Code extension for creating and managing decision records directly in your workspace. This extension helps teams document and track important decisions in their projects.
 
-### Create Decision Records
-Easily create new decision records with a structured format that includes:
-- Title
-- Context
-- Decision
-- Potential Impacts
-
+### Creating Decision Records
 To create a new decision record:
 1. Open the command palette (Cmd+Shift+P / Ctrl+Shift+P)
 2. Type "Record a decision"
-3. Follow the prompts to enter:
-   - Decision title
-   - Context of the decision
-   - The decision itself
-   - Potential impacts
+3. A markdown template will open in your editor with the following sections:
+   - Decision Overview: Name and description of the decision
+   - Context Recording: Current situation and assumptions
+   - Impact Forecast: Positive/negative impacts and required actions
+   - Decision Sidecast: Alternatives and comparison analysis
+4. Fill in the template with your decision details
+5. Save the file (Cmd+S / Ctrl+S)
 
 The extension will:
 - Create a `.decisions` directory in your workspace (if it doesn't exist)
-- Generate a markdown file with your decision record
-- Name the file with the date and decision title
-- Open the file for review
+- Save your decision record as a markdown file
+- Name the file based on your decision name
+- Open the saved file for review
 
 ## File Structure
 
-Decision records are stored in the `.decisions` directory of your workspace. Each file is named using the format:
+Decision records are stored in the `.decisions` directory of your workspace. Each file is named using the decision name (converted to lowercase with spaces replaced by hyphens).
+
+For example, if your decision is named "Use PostgreSQL for Database", the file will be saved as:
 ```
-YYYY-MM-DD-decision-title.md
+.decisions/use-postgresql-for-database.md
 ```
 
-Each decision record follows this template:
-```markdown
-# Decision Title
-
-Date: YYYY-MM-DD
-
-## Context
-[Context of the decision]
-
-## Decision
-[The decision and rationale]
-
-## Impacts
-[Potential impacts and consequences]
-```
+Each decision record follows a structured template that includes:
+- Decision Overview
+- Context Recording
+- Impact Forecast
+- Decision Sidecast
 
 ## Requirements
 
@@ -99,6 +87,49 @@ Fixed issue #.
 Added features X, Y, and Z.
 
 ---
+
+## Development
+
+### Testing the Extension
+
+There are two ways to test the extension:
+
+#### 1. Running in Development Mode
+1. Open this project in VS Code
+2. Press `F5` to start debugging
+3. A new VS Code window will open with the extension loaded
+4. Open the Command Palette (Cmd+Shift+P / Ctrl+Shift+P)
+5. Type "Record a decision" and select the command
+6. Test the workflow:
+   - Verify the template opens
+   - Fill in the decision details
+   - Save the file
+   - Check that it's saved in the `.decisions` directory with the correct name
+
+#### 2. Running Automated Tests
+1. Open a terminal in the project root
+2. Run the following commands:
+   ```bash
+   npm install  # Install dependencies
+   npm run test # Run the test suite
+   ```
+
+The test suite includes:
+- Verification of extension activation
+- Command registration check
+- Full workflow test with template creation and file saving
+- Cleanup of test artifacts
+
+### Test Coverage
+The automated tests cover:
+- Extension presence and activation
+- Command registration
+- Template content verification
+- File saving and naming
+- Directory creation
+- Error handling for invalid inputs
+
+Report any issues or bugs in the GitHub repository's issue tracker.
 
 ## Following extension guidelines
 

@@ -200,8 +200,107 @@ class DecisionRecordPanel {
 export function activate(context: vscode.ExtensionContext) {
     console.log('Decision Record extension is now active!');
 
-    let disposable = vscode.commands.registerCommand('gitme-dev-extension.createDecisionRecord', () => {
-        CodeInputPanel.createOrShow(context.extensionPath);
+    let disposable = vscode.commands.registerCommand('gitme-dev-extension.createDecisionRecord', async () => {
+        // Create template content
+        const template = `# Decision Record: <Enter Decision Name>
+
+## Decision Overview
+- Decision Name: <Enter the name of your decision>
+- Description: <Enter a brief description of the decision>
+
+## Context Recording
+### Current Situation/Problem
+<Describe the situation or problem you are facing that led to this decision>
+
+### Assumptions
+<List the key assumptions behind this decision>
+
+## Impact Forecast
+### Potential Positive Impacts
+<List potential positive impacts to the system>
+
+#### Required Actions for Positive Impacts
+<List actions needed to pursue these positive impacts>
+
+### Potential Negative Impacts
+<List potential negative impacts to the system>
+
+#### Mitigation Actions for Negative Impacts
+<List actions needed to avoid or mitigate these negative impacts>
+
+## Decision Sidecast
+### Alternatives Considered
+<List alternative approaches that were considered>
+
+### Comparison Analysis
+#### Pros of Current Decision
+<List advantages of this decision compared to alternatives>
+
+#### Cons of Current Decision
+<List disadvantages of this decision compared to alternatives>
+`;
+
+        try {
+            // Create a new untitled markdown file
+            const document = await vscode.workspace.openTextDocument({
+                content: template,
+                language: 'markdown'
+            });
+
+            // Show the document in the editor
+            await vscode.window.showTextDocument(document);
+
+            // Register save handler
+            const saveDisposable = vscode.workspace.onDidSaveTextDocument(async (doc) => {
+                if (doc === document) {
+                    // Extract decision name from the first line
+                    const firstLine = doc.lineAt(0).text;
+                    const match = firstLine.match(/^# Decision Record: (.+)$/);
+                    if (!match) {
+                        vscode.window.showErrorMessage('Please provide a decision name in the first line of the document.');
+                        return;
+                    }
+
+                    const decisionName = match[1].trim();
+                    if (decisionName === '<Enter Decision Name>') {
+                        vscode.window.showErrorMessage('Please replace "<Enter Decision Name>" with an actual decision name.');
+                        return;
+                    }
+
+                    // Create .decisions directory if it doesn't exist
+                    const workspaceFolders = vscode.workspace.workspaceFolders;
+                    if (!workspaceFolders) {
+                        vscode.window.showErrorMessage('No workspace folder is open.');
+                        return;
+                    }
+
+                    const decisionsDir = path.join(workspaceFolders[0].uri.fsPath, '.decisions');
+                    if (!fs.existsSync(decisionsDir)) {
+                        fs.mkdirSync(decisionsDir);
+                    }
+
+                    // Create the decision record file
+                    const fileName = `${decisionName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`;
+                    const filePath = path.join(decisionsDir, fileName);
+
+                    try {
+                        fs.writeFileSync(filePath, doc.getText());
+                        await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(filePath));
+                        vscode.window.showInformationMessage(`Decision record saved as ${fileName}`);
+                        
+                        // Close the untitled document
+                        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+                    } catch (err) {
+                        vscode.window.showErrorMessage(`Failed to save decision record: ${err}`);
+                    }
+
+                    // Dispose the save handler
+                    saveDisposable.dispose();
+                }
+            });
+        } catch (err) {
+            vscode.window.showErrorMessage(`Failed to create decision record template: ${err}`);
+        }
     });
 
     context.subscriptions.push(disposable);
